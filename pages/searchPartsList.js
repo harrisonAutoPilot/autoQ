@@ -172,10 +172,10 @@ flexDirection:'column'
  },
 
 flowerSize:{
- width:450,
+ width:650,
  height:hp('100%'),
 opacity:0.3,
- marginLeft:500,
+ marginLeft:700,
  backgroundColor:'#fff',
 },
 listContainer:{

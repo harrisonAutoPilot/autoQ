@@ -250,7 +250,7 @@ top:hp('24%'),
  marginRight:wp('12%'),
    },
    input1: {
-      width: 300,
+      width: 250,
       height: 35,
       margin: 20,
       padding: 8,
@@ -407,9 +407,9 @@ imagegoogB:{
  marginRight:13,
 },
 flowerSize:{
- width:500,
+ width:700,
  height:hp('100%'),
- marginLeft:500,
+ marginLeft:700,
  backgroundColor:'#fff',
 
 }

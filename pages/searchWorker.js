@@ -144,6 +144,8 @@ this.onSelectedItemsChange = (key, value) => {
                 if(value=='mechanic' && location == 'abuja')
                 {
                   this.props.navigation.navigate('SearchWorkerList');
+                   this.props.RBSheetWorker.close();
+                  // this.props.RBSheet.close();
 
                  }
 
@@ -162,7 +164,7 @@ this.onSelectedItemsChange = (key, value) => {
     const { name,email, location,distance,price } = this.props;
     const spin = this.state.spinAnim.interpolate({
       inputRange: [0, 1],
-      outputRange: ['0deg', '360deg']
+      outputRange: ['0deg', '0deg']
     });
 
 
@@ -174,13 +176,13 @@ this.onSelectedItemsChange = (key, value) => {
  <View style={styles.content}>
  <View style={{ height:70, justifyContent:'center', alignItems:'center', marginTop:30}}>
          <Animated.Image
-         style={{height:40,marginBottom:15, width: 40,transform: [{rotate: spin}] }}
-        source={require('../assets/workman.jpeg')} />
+         style={{height:60,marginBottom:10,marginTop:10, width: 60,transform: [{rotate: spin}] }}
+        source={require('../assets/female.png')} />
              <Text style={{fontWeight:'bold', color:'#ff6600', fontSize:12}}>FIND HELP NEARBY</Text>
        </View>
 
            <View style={styles.username}>
-           <View style={{alignItems:'center'}}><Text style={{color:'#006600',fontWeight:'bold', fontSize:20, textTransform:'capitalize'}}>{this.state.value}</Text></View>
+           <View style={{alignItems:'center'}}><Text style={{color:'#006600',fontFamily:'roboto', fontSize:18,marginTop:10, textTransform:'capitalize'}}>{this.state.value}</Text></View>
            <TextInput
            style={styles.input1}
            placeholder='Enter location  or state or city'

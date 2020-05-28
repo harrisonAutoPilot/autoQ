@@ -162,6 +162,7 @@ this.onSelectedItemsChange = (key, value) => {
                 if(value=='toyota' && password == 'brake')
                 {
                   this.props.navigation.navigate('SearchPartsList');
+                   this.props.RBSheet.close();
 
                  }
 
@@ -180,7 +181,7 @@ this.onSelectedItemsChange = (key, value) => {
     const { name,email, password,distance,price } = this.props;
     const spin = this.state.spinAnim.interpolate({
       inputRange: [0, 1],
-      outputRange: ['0deg', '360deg']
+      outputRange: ['0deg', '0deg']
     });
 
 
@@ -192,13 +193,13 @@ this.onSelectedItemsChange = (key, value) => {
  <View style={styles.content}>
  <View style={{ height:70, justifyContent:'center', alignItems:'center', marginTop:30}}>
          <Animated.Image
-         style={{height:60,marginBottom:15, width: 60,transform: [{rotate: spin}] }}
-        source={require('../assets/spaner.png')} />
+         style={{height:70,marginBottom:10,marginTop:15, width: 150,transform: [{rotate: spin}] }}
+        source={require('../assets/toolss.png')} />
              <Text style={{fontWeight:'bold', color:'#666699', fontSize:12}}>SEARCH FOR SPARE PARTS</Text>
        </View>
 
            <View style={styles.username}>
-             <View style={{alignItems:'center'}}><Text style={{color:'#006600',fontWeight:'bold', fontSize:20, textTransform:'capitalize'}}>{this.state.value}</Text></View>
+             <View style={{alignItems:'center'}}><Text style={{color:'#006600', fontSize:18,marginTop:15, textTransform:'capitalize', fontFamily:'roboto'}}>{this.state.value}</Text></View>
            <TouchableOpacity style={styles.input1}  onPress = {() => {
                this.setState({ isVisible:!this.state.isVisible})}}>
            <Text style={{color:'gray', fontSize:12,}}>SELECT CAR</Text>
@@ -223,10 +224,7 @@ this.onSelectedItemsChange = (key, value) => {
           <TouchableOpacity
               style = {styles.signButton}
                onPress={this.saveData}>
-
-
-
-              <Text style = {styles.submitButtonText}  > SEARCH</Text>
+              <Text style = {styles.submitButtonText}> SEARCH</Text>
            </TouchableOpacity>
            </View>
 
@@ -343,7 +341,7 @@ flex:1,
    input1: {
       width: 300,
       height: 45,
-      marginTop:10,
+      marginTop:7,
       padding: 8,
       color: '#666699',
       borderStyle:'solid',

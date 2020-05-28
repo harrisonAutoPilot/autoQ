@@ -71,10 +71,10 @@ class Login extends React.Component <Props> {
                     password: password
                 }
 
-                if(email=='' && password == '')
+                if(email=='08062585929' && password == '1122')
                 {
 
-                    alert("Successful Login!. Welcome Harrison " )
+                    alert("Successful Login!. Welcome Segun " )
                    this.props.navigation.navigate('Home')}
 
                 // else if (email !='harrison' && password != 'admin'){
@@ -109,8 +109,10 @@ class Login extends React.Component <Props> {
 
             <TextInput
                     style={styles.input1}
-                    placeholder='Username'
+                    placeholder='Phone Number'
+                     keyboardType='numeric'
                     autoCapitalize="none"
+                     maxLength={11}
                     placeholderTextColor='gray'
                     onChangeText={(emailVal) =>{
                      this.setState({
@@ -122,9 +124,11 @@ class Login extends React.Component <Props> {
 
                   <TextInput
                   style={styles.input1}
-                  placeholder='Password'
+                  placeholder='4 Digit Pin'
                   autoCapitalize="none"
+                  keyboardType='numeric'
                   secureTextEntry={true}
+                  maxLength={4}  //setting limit of input
                   placeholderTextColor='gray'
                   onChangeText={(passwordVal) =>{
                    this.setState({
@@ -148,7 +152,7 @@ class Login extends React.Component <Props> {
 
            <View style={styles.regWith}>
         <View><Text style={styles.line}> ____ </Text></View>
-        <View><Text style={styles.Te}>Forgot your Password? click here</Text></View>
+        <View><Text style={styles.Te}>Forgot your Pin? click here to reset</Text></View>
         <View><Text style={styles.line}> ____</Text></View>
            </View>
 
@@ -234,7 +238,7 @@ top:hp('35%'),
  marginRight:wp('12%'),
    },
    input1: {
-      width: 300,
+      width: 210,
       height: 35,
       margin: 20,
       padding: 8,

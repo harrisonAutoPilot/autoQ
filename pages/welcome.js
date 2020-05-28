@@ -42,6 +42,7 @@ const height = Dimensions.get('window').height;
 
       this.state = {
         size: { width, height },
+         spinAnim: new Animated.Value(0),
       };
     }
    static navigationOptions = {
@@ -53,9 +54,24 @@ const height = Dimensions.get('window').height;
        this.setState({ size: { width: layout.width, height: layout.height,borderTopRightRadius:50,borderBottomRightRadius:50,left:2 } });
      }
 
+                     componentDidMount(){
+                      Animated.loop(Animated.timing(
+                         this.state.spinAnim,
+                       {
+                         toValue: 1,
+                         duration: 7000,
+                         easing: Easing.linear,
+                         useNativeDriver: true
+                       }
+                     )).start();
+                      }
 
    render() {
     const {navigate} = this.props.navigation;
+    const spin = this.state.spinAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg']
+    });
 
     return (
      <View style={styles.container}>
@@ -99,8 +115,10 @@ const height = Dimensions.get('window').height;
                             style={styles.circleMid}
                             onPress={() => this.RBSheet.open()}>
 
-                        <View  >
-                        <Image source={require('../assets/spaner.png')} style={styles.iconParts}  />
+                        <View  style={{ height:70, justifyContent:'center', alignItems:'center', marginTop:-15}} >
+                        <Animated.Image
+                        style={{height:45,marginBottom:10,marginTop:15, width: 45,transform: [{rotate: spin}] }}
+                       source={require('../assets/maintenancee.png')} />
                         <Text style={styles.buttonText}>Find Spare Parts</Text>
                         </View>
                     </TouchableOpacity>
@@ -118,6 +136,7 @@ const height = Dimensions.get('window').height;
       ref={ref => {
         this.RBSheet = ref;
        const {navigate,} = this.props.navigation;
+        // const {ref} = this.props.RBSheet;
 
       }}
       height={300}
@@ -135,6 +154,7 @@ const height = Dimensions.get('window').height;
 
                  <Search
                  navigation={this.props.navigation}
+                RBSheet={this.RBSheet}
 
 
 
@@ -149,6 +169,7 @@ const height = Dimensions.get('window').height;
       ref={ref => {
         this.RBSheetWorker = ref;
        const {navigate,} = this.props.navigation;
+
 
       }}
       height={300}
@@ -166,7 +187,7 @@ const height = Dimensions.get('window').height;
 
                  <SearchWorker
                  navigation={this.props.navigation}
-
+                  RBSheetWorker={this.RBSheetWorker}
 
 
                  />
@@ -328,11 +349,11 @@ justifyContent:'center',
 alignItems:'center',
 },
 iconParts:{
-width:70,
-height:70,
+width:40,
+height:40,
 marginLeft:25,
 marginRight:25,
-marginBottom:-5,
+marginBottom:5,
 justifyContent:'center',
 alignItems:'center',
 },
@@ -403,10 +424,10 @@ logoSize:{
 resizeMode: 'contain',
 },
 workerSize:{
- width:450,
+ width:650,
  height:hp('100%'),
  marginRight:1500,
- backgroundColor:'#fff'
+ backgroundColor:'#fff',
 },
 contentContainer: {
     borderWidth: 2,

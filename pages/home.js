@@ -12,7 +12,9 @@ import {
    Linking,
    BackHandler,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
+
 
 import {
  heightPercentageToDP as hp,
@@ -29,7 +31,7 @@ import {
 import VSmallLogo from '../components/logo/vSmallLogo'
 import Hr from 'react-native-hr-component'
 const width = Dimensions.get('window').width;
-
+import Select from 'react-native-select-plus';
 
 class Home extends React.Component <Props> {
  static navigationOptions = {
@@ -45,7 +47,39 @@ class Home extends React.Component <Props> {
            name: '',
            phone: '',
            visible: false,
-       }
+          isVisible: false,
+          isVisibleSuccess:false,
+          location1: '',
+          location2: '',
+          location3: '',
+          location4: '',
+          location5: '',
+          value: null,
+       items: [
+     { key: 1, label: "Abia" },
+     { key: 2, label: "Adamawa" },
+     { key: 3, label: "Akwa Ibom" },
+     { key: 4, label: "Anambra" },
+     { key: 5, label: "Magic" },
+     { key: 6, label: "Fashion" },
+     { key: 7, label: "Building" },
+     { key: 8, label: "Art" },
+     { key: 9, label: "Academics" },
+
+   ],
+ };
+
+ this.onSelectedItemsChange = (key, value) => {
+   this.setState({ value: value });
+ };
+
+}
+
+saveData2 = ()=>{
+      this.setState({
+       isVisible:false,
+       isVisibleSuccess:true,
+      });
 
 
 }
@@ -60,7 +94,7 @@ BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick)
 }
 
 handleBackButtonClick() {
-this.props.navigation.navigate('Welcome');
+this.props.navigation.navigate('love');
 return true;
 }
 
@@ -69,9 +103,10 @@ return true;
 
   render() {
     const {navigate} = this.props.navigation;
+    const { value, items } = this.state;
     return (
      <View style={styles.container}>
-
+         <Image source={require('../assets/worker.jpg')} style={styles.flowerSize}/>
      <View style={{position:'absolute', width:wp('100%'), height:hp('10%'), alignItems:'center',top:hp('3%')}}>
 
      </View>
@@ -131,7 +166,8 @@ return true;
 
      <View style={{flexDirection:'row'}}>
      <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('Water')}>
+         onPress = {() => {
+         this.setState({ isVisible:!this.state.isVisible})}}>
            <View style={styles.water}>
                <Image source={require('../assets/google-pin.png')} style={styles.waterSizeLoc} />
                <Text style={{fontSize:15,color:'#666699'}}>Location</Text>
@@ -147,15 +183,15 @@ return true;
            </TouchableOpacity>
        </View>
        <View style={{flexDirection:'row'}}>
-          <TouchableOpacity
-                 onPress={() => this.props.navigation.navigate('Water')}>
+          <TouchableOpacity >
+
                 <View style={styles.waterDown}>
                     <Image source={require('../assets/google-pin1.png')} style={styles.waterSize} />
-                    <Text style={{fontSize:15,color:'#666699'}}>Update Location</Text>
+                    <Text style={{fontSize:12,color:'#666699'}}>Update Location</Text>
                 </View>
                </TouchableOpacity>
-               <TouchableOpacity
-                     onPress={() => this.props.navigation.navigate('Juice')}>
+               <TouchableOpacity >
+
                 <View style={styles.juiceDown}>
                       <Image source={require('../assets/maintenanceColor.png')} style={styles.waterSizeFund} />
                       <Text style={{fontSize:15,color:'#666699'}}>Get Tools</Text>
@@ -163,6 +199,146 @@ return true;
                 </TouchableOpacity>
                 </View>
      </View>
+     <Modal
+        animationType = {"fade"}
+        transparent = {true}
+        visible = {this.state.isVisible}
+        onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+
+            <View style ={styles.modal} >
+
+                <View style={styles.selectContainer}>
+                     <Text style={styles.titleText}>Register Operating State & Locations</Text>
+                      <View style={styles.ModalFormContainer}>
+                            <Select
+                                data={items}
+                                style={styles.select}
+                                placeholder="Select State"
+                                onSelect={this.onSelectedItemsChange.bind(this)}
+                                search={true}
+                                width={230}
+                              />
+                            <TextInput
+                                style={styles.input1}
+                                placeholder='Location One'
+                                autoCapitalize="none"
+                                placeholderTextColor='gray'
+                                onChangeText={(location1Val) =>{
+                                this.setState({
+                                location1:location1Val,
+                                  });
+                                  }}
+                              value={this.state.location1}
+                              />
+                              <TextInput
+                                  style={styles.input1}
+                                  placeholder='Location Two'
+                                  autoCapitalize="none"
+                                  placeholderTextColor='gray'
+                                  onChangeText={(location2Val) =>{
+                                  this.setState({
+                                  location2:location2Val,
+                                    });
+                                    }}
+                                value={this.state.location2}
+                                />
+                                <TextInput
+                                    style={styles.input1}
+                                    placeholder='Location Three'
+                                    autoCapitalize="none"
+                                    placeholderTextColor='gray'
+                                    onChangeText={(location3Val) =>{
+                                    this.setState({
+                                    location3:location3Val,
+                                      });
+                                      }}
+                                  value={this.state.location3}
+                                  />
+                                  <TextInput
+                                      style={styles.input1}
+                                      placeholder='Location Four'
+                                      autoCapitalize="none"
+                                      placeholderTextColor='gray'
+                                      onChangeText={(location4Val) =>{
+                                      this.setState({
+                                      location4:location4Val,
+                                        });
+                                        }}
+                                    value={this.state.location4}
+                                    />
+                                    <TextInput
+                                        style={styles.input1}
+                                        placeholder='Location Five'
+                                        autoCapitalize="none"
+                                        placeholderTextColor='gray'
+                                        onChangeText={(location5Val) =>{
+                                        this.setState({
+                                        location5:location5Val,
+                                          });
+                                          }}
+                                      value={this.state.location5}
+                                      />
+                                      <View style={styles.btnContainerPay}>
+
+
+                                                          <View style={styles.otherServiceBtn}>
+                                                          <TouchableOpacity style={styles.bckBtn} onPress = {() => {
+                                                              this.setState({ isVisible:false})}}>
+                                                          <Text style={{color:'gray', fontSize:10,}}>CANCEL</Text>
+                                                          </TouchableOpacity>
+                                                          <TouchableOpacity style={styles.bckBtn}  onPress={this.saveData2}>
+                                                          <Text style={{color:'gray', fontSize:10,}}>PROCEED</Text>
+                                                          </TouchableOpacity>
+                                                          </View>
+
+
+
+                                      </View>
+                      </View>
+                </View>
+            </View>
+
+
+
+
+      </Modal>
+
+      <Modal
+         animationType = {"fade"}
+         transparent = {true}
+         visible = {this.state.isVisibleSuccess}
+         onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+
+             <View style ={styles.modal} >
+
+                 <View style={styles.selectContainer}>
+                     <Image source={require('../assets/smile.png')} style={styles.smileSize}/>
+                     <Text style={{alignItems:'center',fontSize:25, color:'#666699', textAlign:'center', fontWeight:'bold', marginTop:20}}>Congratulations!</Text>
+                     <Text style={{alignItems:'center',fontSize:15, color:'#666699', textAlign:'center', fontWeight:'bold', marginTop:5, marginBottom:40}}>Registration Completed</Text>
+                 </View>
+                 <View style={styles.btnContainerPay}>
+
+
+                                     <View style={styles.otherServiceBtn}>
+
+                                     <TouchableOpacity style={styles.bckBtnClose} onPress = {() => {
+                                         this.setState({ isVisibleSuccess:false})}}>
+                                     <Text style={{color:'gray', fontSize:13,}}>CLOSE</Text>
+                                     </TouchableOpacity>
+                                     </View>
+
+
+
+                 </View>
+             </View>
+
+
+
+
+       </Modal>
+
    </View>
 
 
@@ -192,8 +368,28 @@ flexDirection:'column',
  height:60,
  alignSelf: 'center',
  resizeMode: 'contain',
-
   },
+  input1: {
+     width: 230,
+     height: 37,
+     marginTop:10,
+     padding: 3,
+     paddingLeft:20,
+     color: '#e6e6e6',
+     borderStyle:'solid',
+     borderColor:'grey',
+     fontSize: 15,
+     borderWidth:0.7,
+     justifyContent:'center',
+     borderRadius:3,
+     marginLeft:30,
+     marginRight:30,
+   },
+   select:{
+   borderRadius:3,
+   marginLeft:30,
+   marginRight:30,
+   },
   imageSizeLogout:{
   width: 40,
   height:40,
@@ -224,16 +420,17 @@ flexDirection:'column',
    },
    report:{
     flexDirection:'row',
-    width:wp('85%'),
+    width:wp('80%'),
     height:hp('13%'),
     position:'absolute',
     top:165,
     justifyContent:'space-around',
-    zIndex:2,
+    zIndex:14,
     borderRadius:10,
     borderStyle:'solid',
     borderWidth:1,
     borderColor:'gray',
+    marginRight:30,
 
    },
    callReport:{
@@ -269,13 +466,21 @@ flexDirection:'column',
  },
 
 flowerSize:{
- width:450,
- height:hp('58%'),
- marginTop:-200,
- marginLeft:550,
+ width:650,
+ height:hp('100%'),
+ marginTop:-20,
+ marginLeft:750,
  backgroundColor:'#fff',
- zIndex:4,
- opacity:0.5
+ zIndex:1,
+ opacity:0.1
+},
+smileSize:{
+ width:200,
+ height:200,
+ marginTop:10,
+ resizeMode:'contain',
+ alignItems:'center',
+ marginLeft:45,
 },
 aboutComapny:{
  width:wp('100%'),
@@ -313,6 +518,8 @@ waterContainer:{
  flexDirection:'column',
  justifyContent:'center',
  backgroundColor:'#ffffff',
+ zIndex:12,
+
 },
 juiceContainer:{
  width:wp('100%'),
@@ -327,14 +534,14 @@ juiceContainer:{
  bottom:0,
 },
 water:{
- width:wp('33%'),
- height:hp('17%'),
+ width:wp('29%'),
+ height:hp('16%'),
 borderRadius:10,
 borderWidth:1,
 borderStyle:'solid',
 borderColor:'#666699',
-marginLeft:50,
-marginRight:20,
+marginLeft:65,
+marginRight:10,
 alignItems:'center',
 resizeMode: 'contain',
  zIndex:2,
@@ -346,14 +553,14 @@ resizeMode: 'contain',
  elevation: hp('0.5%'),
 },
 waterDown:{
- width:wp('33%'),
- height:hp('17%'),
+ width:wp('29%'),
+ height:hp('16%'),
 borderRadius:10,
 borderWidth:1,
 borderStyle:'solid',
 borderColor:'#666699',
-marginLeft:50,
-marginRight:20,
+marginLeft:65,
+marginRight:10,
 alignItems:'center',
 resizeMode: 'contain',
  zIndex:2,
@@ -367,13 +574,13 @@ resizeMode: 'contain',
 
 },
 juice:{
- width:wp('33%'),
- height:hp('17%'),
+ width:wp('29%'),
+ height:hp('16%'),
  borderRadius:10,
 borderWidth:1,
  borderStyle:'solid',
 borderColor:'#666699',
-marginRight:50,
+marginRight:70,
 marginLeft:20,
  alignItems:'center',
  resizeMode: 'contain',
@@ -387,8 +594,8 @@ marginLeft:20,
   elevation: hp('0.5%'),
 },
 juiceDown:{
- width:wp('33%'),
- height:hp('17%'),
+ width:wp('29%'),
+ height:hp('16%'),
  borderRadius:10,
 borderWidth:1,
  borderStyle:'solid',
@@ -398,7 +605,7 @@ marginLeft:20,
  resizeMode: 'contain',
   zIndex:8,
   marginTop:20,
-  marginRight:50,
+  marginRight:70,
   zIndex:2,
    backgroundColor:'#ffffff',
   shadowColor: '#fff',
@@ -411,6 +618,14 @@ marginLeft:20,
 title:{
 width:wp('80%'),
 marginLeft:5,
+},
+titleText:{
+ fontSize:18,
+ color:'#ff6600',
+alignItems:'center',
+textAlign:'center',
+fontFamily:'roboto',
+margin:20,
 },
 reportCover:{
 flexDirection:'row',
@@ -439,30 +654,159 @@ alignItems:'center',
 opacity:0.8
 },
 waterSize:{
- width:60,
- height:60,
+ width:40,
+ height:40,
  margin:15,
 },
 
 waterSizeLoc:{
- width:50,
- height:50,
+ width:40,
+ height:40,
  margin:15,
  resizeMode:'contain'
 },
 waterSizeFund:{
- width:50,
- height:50,
- margin:20,
+ width:35,
+ height:35,
+ margin:15,
 },
 waterSizeFundTingg:{
- width:70,
- height:70,
- margin:5,
+ width:50,
+ height:50,
+ margin:10,
+
 },
 juiceSize:{
  width:80,
  height:80,
  margin:40
-}
+},
+modal: {
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor : "#fff",
+  height: 450 ,
+  width: '80%',
+  borderRadius:10,
+  borderWidth: 1,
+  borderColor: '#fff',
+  marginTop: 105,
+  marginLeft: 40,
+  shadowColor: '#fff',
+ shadowOffset: { width: 0, height:hp('1.5%') },
+ shadowOpacity: 2,
+ shadowRadius: 1,
+  elevation: hp('0.8%'),
+   },
+selectContainer:{
+flexDirection:'column',
+width:300,
+height:450,
+position:'absolute'
+// flexWrap: 'wrap',
+},
+buttonContainer: {
+flexDirection:'row',
+width:300,
+marginTop:50,
+alignItems:'center',
+justifyContent:'center',
+flexWrap: 'wrap',
+
+},
+selectImg:{
+height: 70,
+width: 70,
+resizeMode:'contain',
+marginBottom:15
+},
+selectText:{
+color:'#ff6600',
+marginTop:-15,
+fontSize:10
+},
+ModalFormContainer:{
+flexDirection:'column',
+alignItems:'center',
+},
+btnContainerPay:{
+ width:320,
+ height:50,
+ borderWidth:0,
+ borderStyle:'solid',
+ borderColor:'#f6f6f6',
+ position:'absolute',
+ top:300,
+ alignItems:'center',
+},
+otherServiceBtn:{
+ width:320,
+ height:40,
+ alignItems:'center',
+ flexDirection:'row',
+ justifyContent:'space-evenly'
+},
+otherServiceBtn1:{
+ width:320,
+ height:90,
+ alignItems:'center',
+ flexDirection:'column',
+
+
+},
+otherServiceBtnSer:{
+ width:320,
+ height:40,
+ alignItems:'center',
+ flexDirection:'row',
+ justifyContent:'space-evenly'
+
+},
+bckBtn:{
+ width:120,
+ height:35,
+ backgroundColor:'#fff',
+ alignItems:'center',
+ justifyContent:'center',
+ shadowColor: '#fff',
+shadowOffset: { width: 0, height:hp('1.5%') },
+shadowOpacity: 2,
+shadowRadius: 1,
+ elevation: hp('0.8%'),
+ alignItems:'center',
+ borderRadius:50,
+},
+bckBtnClose:{
+ width:230,
+ height:40,
+ backgroundColor:'#fff',
+ alignItems:'center',
+ justifyContent:'center',
+ shadowColor: '#fff',
+shadowOffset: { width: 0, height:hp('1.5%') },
+shadowOpacity: 2,
+shadowRadius: 1,
+ elevation: hp('0.8%'),
+ alignItems:'center',
+ borderRadius:50,
+ marginTop:30
+},
+
+bckBtnP:{
+ width:280,
+ height:40,
+ backgroundColor:'#fff',
+ alignItems:'center',
+ justifyContent:'center',
+ shadowColor: '#fff',
+shadowOffset: { width: 0, height:hp('1.5%') },
+shadowOpacity: 2,
+shadowRadius: 1,
+ elevation: hp('0.8%'),
+ alignItems:'center',
+ borderRadius:50,
+ borderColor:'gray',
+ flexDirection:'row',
+ marginTop:10,
+},
 })

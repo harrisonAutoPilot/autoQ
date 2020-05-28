@@ -469,9 +469,9 @@ submitButton: {
     borderRadius:10,
    },
 flowerSize:{
- width:450,
+ width:700,
  height:hp('100%'),
- marginLeft:500,
+ marginLeft:700,
  backgroundColor:'#fff',
  opacity:0.2
 },
