@@ -19,7 +19,7 @@ import {
  heightPercentageToDP as hp,
  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-
+ import AsyncStorage from '@react-native-community/async-storage';
 import {
   Header,
   LearnMoreLinks,
@@ -42,7 +42,7 @@ import CarButtons from './carButton'
  import lexus from '../assets/lexus.png';
  import bmw from '../assets/BMW.jpg';
  import peugeot from '../assets/Peugeot.jpg';
-
+import Spinner from './spinner'
 
 
 class Search extends React.Component <Props> {
@@ -64,6 +64,8 @@ static navigationOptions = {
           phone: '',
           visible: false,
           isVisible: false,
+          isVisibleSpinner:false,
+          parts:'',
           spinAnim: new Animated.Value(0),
           value: null,
           options: [
@@ -149,26 +151,76 @@ this.onSelectedItemsChange = (key, value) => {
 
                 }
 
+                saveData2 = async () => {
+                   try {
+                     await AsyncStorage.setItem(name, JSON.stringify(data && data.user.name))
+                     alert(name + 'Data successfully saved')
+                      this.props.navigation.navigate('Home')
+                   } catch (e) {
+                    this.setState({ errorMessage: error.toString() });
+                    this.setState({ isVisible: false});
+                    // alert(error)
+                     alert( error, 'Failed to save the data to the storage')
+                   }
+                 }
+
+
+
+
 
          saveData = ()=>{
-                const {value,password} = this.state;
-
+                const {value,parts} = this.state;
+                   this.setState({ isVisibleSpinner:true})
                 //save data with asyncstorage
                 let loginDetails={
                     value: value,
-                    password: password
+                    parts_name: parts
                 }
 
-                if(value=='toyota' && password == 'brake')
-                {
-                  this.props.navigation.navigate('SearchPartsList');
-                   this.props.RBSheet.close();
+                const requestOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      car_type: value,
+                      parts_name: parts
+                      })
+                };
+                fetch('http://0886d79e2291.ngrok.io/getSpareParts', requestOptions)
+                .then(async response => {
+                    const data = await response.json();
+                       console.log(data);
+                       this.setState({
+                         id: data && data.user.id,
 
-                 }
+                         parts_name:data && data.user.parts_name,
+                         description:data && data.user.description,
 
-                else if (value =='' && password == ''){
-                  alert("Sorry empty car type! and spare parts given!")
-                  }
+
+                        })
+                        let okk = JSON.stringify (response.status);
+                        let id = JSON.stringify (data.user.id);
+                        let parts_name =  data && data.user.parts_name;
+                        let description =  data && data.user.description;
+
+
+                              if  (response.status === 200){
+                               this.props.RBSheet.close();
+                               this.setState({ isVisibleSpinner: false});
+                               this.props.navigation.navigate('SearchPartsList',{car_type: this.state.value , parts_name1: this.state.parts,})
+                                     console.log('odi look',id);
+                                  this.setState({ isVisibleSpinner: false});
+                                     // this.props.navigation.navigate('Home')
+                              } else{
+                                  // this.setState({loader: false});
+                                  // this.setState({code: 'Error'});
+                                  // this.setState({resp: userInfo});
+                                  // this.setState({dialogVisible: true});
+                                  // this.setState({ errorMessage: error.toString() });
+                                  this.setState({ isVisible: false});
+                                   alert(error)
+
+                              }
+                       })
 
 
        }
@@ -211,13 +263,13 @@ this.onSelectedItemsChange = (key, value) => {
                           autoCapitalize="none"
 
                           placeholderTextColor='gray'
-                          onChangeText={(passwordVal) =>{
+                          onChangeText={(partsVal) =>{
                            this.setState({
-                            password:passwordVal,
+                            parts:partsVal,
                            });
                           }}
 
-                          value={this.state.password}
+                          value={this.state.parts}
                           />
  </View>
             <View style={{width:wp('100%'), flexDirection:'row', alignSelf:'center',justifyContent:'space-evenly', marginTop:10, marginBottom:20}}>
@@ -266,6 +318,7 @@ this.onSelectedItemsChange = (key, value) => {
                     <Text style={styles.selectText}>{item.text}</Text>
                      {value === item.key}
 
+
                     </TouchableOpacity>
 
 
@@ -282,6 +335,20 @@ this.onSelectedItemsChange = (key, value) => {
 
 
       </Modal>
+
+      <Modal
+         animationType = {"fade"}
+         transparent = {true}
+         visible = {this.state.isVisibleSpinner}
+         onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+          <View style ={styles.modalSpinner} >
+            <Spinner />
+          </View>
+
+
+
+
+       </Modal>
 </View>
 
 
@@ -353,6 +420,7 @@ flex:1,
        marginLeft:wp('15%'),
        marginRight:wp('15%'),
        borderRadius:4,
+       textTransform:'capitalize',
     },
     modal: {
       justifyContent: 'center',
@@ -378,6 +446,19 @@ height:450,
 position:'absolute'
  // flexWrap: 'wrap',
 },
+modalSpinner: {
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor : "transparent",
+  height: 400 ,
+  width: '80%',
+  borderRadius:10,
+  borderWidth: 0,
+  borderColor: '#fff',
+  marginTop: 100,
+  marginLeft: 40,
+
+   },
 buttonContainer: {
 flexDirection:'row',
  width:300,

@@ -11,7 +11,8 @@ import {
   Image,
    BackHandler,
   TouchableOpacity,
-} from 'react-native';
+  Modal,
+ } from 'react-native';
 
 import {
  heightPercentageToDP as hp,
@@ -28,6 +29,9 @@ import {
 import Hr from 'react-native-hr-component'
 const width = Dimensions.get('window').width;
 import {juiceData} from '../utils/juice/juiceCardData';
+import Spinner from './spinner'
+import AsyncStorage from '@react-native-community/async-storage';
+
 
 class SearchPartsList extends React.Component <Props> {
 
@@ -42,13 +46,88 @@ class SearchPartsList extends React.Component <Props> {
           password: '',
            name: '',
            phone: '',
+          isVisibleSpinner:false,
+          car_type1: this.props.car_type,
+          check:[],
+          //parts_name1:this.props.value,
        }
 
 
 }
 
+
+          componentDidMount() {
+             this.saveData();
+           }
+
+
+ saveData = ()=>{
+         console.log('New check Car', this.state.newCarType)
+        const {value,parts} = this.state;
+           this.setState({ isVisibleSpinner:true})
+        const requestOptions = {
+
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              car_type: this.props.navigation.getParam('car_type', this.state.car_type),
+              parts_name: this.props.navigation.getParam('parts_name1', this.state.parts_name),
+              })
+        };
+        fetch('http://0886d79e2291.ngrok.io/getSpareParts', requestOptions)
+        .then(async response => {
+            const data = await response.json();
+               console.log('this Love SearchPartsList Page', data);
+               this.setState({
+                 check:data
+                })
+               console.log('just to harry', this.state.check.user);
+                let id = data && data.user.id;
+                let parts_name =  data && data.user.parts_name;
+                let description =  data && data.user.description;
+
+
+                      if  (response.status === 200){
+                       // console.log('odi look',id);
+                       // try {
+                       //   this.setState({ isVisibleSpinner: false});
+                       //   await AsyncStorage.setItem('Parts_id', okk)
+                       //   alert(id + " " + 'Data successfully saved')
+                       //   this.props.RBSheet.close();
+                       //   this.props.navigation.navigate('SearchPartsList',{car_type: this.state.value , parts_name1: this.state.parts,})
+                       //
+                       //    console.log('odi next',description);
+                       // } catch (e) {
+                       //  this.setState({ errorMessage: error.toString() });
+                       //  this.setState({ isVisible: false});
+                       //  // alert(error)
+                       //   alert( error, 'Failed to save the data to the storage')
+                       // }
+                               this.setState({ isVisibleSpinner: false});
+                             // this.props.navigation.navigate('Home')
+                      } else{
+                          // this.setState({loader: false});
+                          // this.setState({code: 'Error'});
+                          // this.setState({resp: userInfo});
+                          // this.setState({dialogVisible: true});
+                          // this.setState({ errorMessage: error.toString() });
+                          this.setState({ isVisible: false});
+                           alert(error)
+
+                      }
+               })
+
+
+ }
+
+
+
+
   render() {
-    const {navigate} = this.props.navigation;
+      const { navigation } = this.props;
+      // const {harry} = this.state.check.user;
+      // console.log('jimmy',harry);
+
     return (
      <View style={styles.container}>
      <View style={styles.title}>
@@ -68,29 +147,30 @@ class SearchPartsList extends React.Component <Props> {
   ref={(scrollView) => {scrollView = scrollView; }}
  showsVerticalScrollIndicator={false}>
  {
-  juiceData && juiceData.length > 0 && juiceData.map(val => {
+  this.state.check.user && this.state.check.user.length > 0 && this.state.check.user.map(val => {
    return (
     <TouchableOpacity
-         onPress={() => this.props.navigation.navigate('SearchDetails')}>
-     <View style={styles.listContainer} key={val.id}>
+       key={val.id} id={val.id}
+         onPress={() => this.props.navigation.navigate('SearchDetails', val)}>
+     <View style={styles.listContainer} >
           <View style={styles.avatar}>
-                 <Text style={styles.avatarLetter}>{val.ProductInitial}</Text>
+                 <Text style={styles.avatarLetter}>{val.seller_state}</Text>
           </View>
            <View style={styles.listContent}>
            <View style={styles.firstRow}>
-           <Text style={styles.quantityText}>{val.parts}</Text>
-           <Text style={styles.dateText}>{val.condition}</Text>
+           <Text style={styles.quantityText}>{val.parts_name}</Text>
+           <Text style={styles.dateText}>{val.parts_status}</Text>
 
            </View>
                <View style={styles.secondRow}>
-                 <Text style={styles.secondRowText}>₦{val.transCode}</Text>
+                 <Text style={styles.secondRowText}>₦{val.price}</Text>
                </View>
            <View style={styles.thirdRow}>
               <View style={styles.locImg}>
            <Image source={require('../assets/pin.png')} style={styles.locSize}/>
               </View>
               <View style={styles.locText}>
-           <Text style={styles.locTextMessage}>{val.deliveryAddress}</Text>
+           <Text style={styles.locTextMessage}>{val.seller_address}</Text>
                </View>
            </View>
            </View>
@@ -102,8 +182,24 @@ class SearchPartsList extends React.Component <Props> {
     }
  </ScrollView>
      </View>
+     <Modal
+        animationType = {"fade"}
+        transparent = {true}
+        visible = {this.state.isVisibleSpinner}
+        onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
 
-   </View>
+            <View style ={styles.modalSpinner} >
+
+            <Spinner />
+            <Text style={{color:'gray'}}>Processing ...</Text>
+                </View>
+
+
+
+
+      </Modal>
+    </View>
+
 
 
 
@@ -213,8 +309,20 @@ avatarLetter:{
  color:'#fff',
  justifyContent:'center',
  textTransform:'capitalize'
-
 },
+modalSpinner: {
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor : "transparent",
+  height: 400 ,
+  width: '80%',
+  borderRadius:10,
+  borderWidth: 0,
+  borderColor: '#fff',
+  marginTop: 100,
+  marginLeft: 40,
+
+   },
 firstRow:{
 width:wp('70%'),
 flexDirection:'row',

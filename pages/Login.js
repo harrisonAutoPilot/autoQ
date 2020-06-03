@@ -9,6 +9,7 @@ import {
   Button,
   Dimensions,
   Image,
+  Modal,
    BackHandler,
   TouchableOpacity,
 } from 'react-native';
@@ -17,7 +18,7 @@ import {
  heightPercentageToDP as hp,
  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-
+import Toast from 'react-native-root-toast';
 import {
   Header,
   LearnMoreLinks,
@@ -27,9 +28,16 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import Hr from 'react-native-hr-component'
 const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 import MediumLogo from '../components/logo/mediumLogo'
+import Spinner from './spinner'
+ import AsyncStorage from '@react-native-community/async-storage';
+ const urlLogin = window.$urlLog
+
+
 
 class Login extends React.Component <Props> {
+
  static navigationOptions = {
     //To hide the NavigationBar from current Screen
     header: null
@@ -43,10 +51,22 @@ class Login extends React.Component <Props> {
            name: '',
            phone: '',
            visible: false,
+          spinner: false,
+          isVisible:false,
+          size: { width, height },
        }
 
 
-}
+             }
+             componentDidMount() {
+                     setTimeout(() => this.setState({
+                         toastVisible: true
+                     }), 2000); // show toast after 2s
+
+                     setTimeout(() => this.setState({
+                         visible: false
+                     }), 5000); // hide toast after 5s
+                 };
 
                 componentWillMount() {
                 BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -61,38 +81,132 @@ class Login extends React.Component <Props> {
                 return true;
                 }
 
+                 saveData2 = async () => {
+                    try {
+                      await AsyncStorage.setItem(name, JSON.stringify(data && data.user.name))
+                      alert(name + 'Data successfully saved')
+                       this.props.navigation.navigate('Home')
+                    } catch (e) {
+                     this.setState({ errorMessage: error.toString() });
+                     this.setState({ isVisible: false});
+                     // alert(error)
+                      alert( error, 'Failed to save the data to the storage')
+                    }
+                  }
 
-         saveData = ()=>{
-                const {email,password} = this.state;
 
-                //save data with asyncstorage
-                let loginDetails={
-                    email: email,
-                    password: password
+                saveData = ()=>{
+                 this.setState({ isVisible: true});
+                 // POST request using fetch with error handling
+                 const requestOptions = {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                       password: this.state.password,
+                       phone: this.state.phone
+                       })
+                 };
+                 fetch('http://0886d79e2291.ngrok.io/userlogin', requestOptions)
+                 .then(async response => {
+                     const data = await response.json();
+                        console.log(data);
+                        this.setState({
+                          id: data && data.user.id,
+                          name:data && data.user.name,
+                          email:data && data.user.email,
+
+
+                         })
+                         let id =  data && data.user.id;
+                         let name =  data && data.user.name;
+                         let email =  data && data.user.email;
+
+                               if  (response.status === 200){
+                                try {
+                                  this.setState({ isVisible: false});
+                                  await AsyncStorage.setItem('email1', email)
+                                  alert(email + " " + 'Data successfully saved')
+                                   this.props.navigation.navigate('Home')
+                                } catch (e) {
+                                 this.setState({ errorMessage: error.toString() });
+                                 this.setState({ isVisible: false});
+                                 // alert(error)
+                                  alert( error, 'Failed to save the data to the storage')
+                                }
+                                        this.setState({ isVisible: false});
+                                      // this.props.navigation.navigate('Home')
+                               } else{
+                                   // this.setState({loader: false});
+                                   // this.setState({code: 'Error'});
+                                   // this.setState({resp: userInfo});
+                                   // this.setState({dialogVisible: true});
+                                   // this.setState({ errorMessage: error.toString() });
+                                   this.setState({ isVisible: false});
+                                    alert(error)
+
+                               }
+                        })
+
+
+                       //
+                       // const {email,password} = this.state;
+                       //
+                       // //save data with asyncstorage
+                       // let loginDetails={
+                       //     email: email,
+                       //     password: password
+                       // }
+                       //
+                       // if(email=='harrison' && password == 'admin')
+                       // {
+                       //
+                       //     alert("Successful Login!. Welcome to Abide In My Word Daily Devotional")
+                       //    this.props.navigation.navigate('Home')}
+                       //
+                       // else if (email !='harrison' && password != 'admin'){
+                       //   alert("Sorry Registration has been disabled by admin! Please Contact Your Admin On  08062585929")
+                       //   this.props.navigation.navigate('')}
+
+
+
                 }
 
-                if(email=='08062585929' && password == '1122')
-                {
 
-                    alert("Successful Login!. Welcome Segun " )
-                   this.props.navigation.navigate('Home')}
-
-                // else if (email !='harrison' && password != 'admin'){
-                //   alert("Wrong Username or Password. Please Contact Your Admin On  08062585929")
-                //   this.props.navigation.navigate('')}
-
-
-
-       }
+       //
+       //   saveData = ()=>{
+       //          const {email,password} = this.state;
+       //
+       //          //save data with asyncstorage
+       //          let loginDetails={
+       //              email: email,
+       //              password: password
+       //          }
+       //
+       //          if(email=='08062585929' && password == '1122')
+       //          {
+       //
+       //              alert("Successful Login!. Welcome Segun " )
+       //             this.props.navigation.navigate('Home')}
+       //
+       //          // else if (email !='harrison' && password != 'admin'){
+       //          //   alert("Wrong Username or Password. Please Contact Your Admin On  08062585929")
+       //          //   this.props.navigation.navigate('')}
+       //
+       //
+       //
+       // }
 
 
 
 
 
          render() {
+      // const urlNew = window.$url
     const {navigate} = this.props.navigation;
+       console.log('may be', global.urlLogin);
     return (
      <View style={styles.container}>
+
      <Image source={require('../assets/wokerr.jpg')} style={styles.flowerSize}/>
      <View style={{position:'absolute', width:wp('100%'), height:hp('10%'), alignItems:'center', justifyContent:'center', top:hp('3%')}}>
 
@@ -103,8 +217,8 @@ class Login extends React.Component <Props> {
 
    </View>
 
-
  <View style={styles.content}>
+
            <View style={styles.username}>
 
             <TextInput
@@ -114,12 +228,12 @@ class Login extends React.Component <Props> {
                     autoCapitalize="none"
                      maxLength={11}
                     placeholderTextColor='gray'
-                    onChangeText={(emailVal) =>{
+                    onChangeText={(phoneVal) =>{
                      this.setState({
-                      email:emailVal,
+                      phone:phoneVal,
                      });
                     }}
-                    value={this.state.email}
+                    value={this.state.phone}
                   />
 
                   <TextInput
@@ -138,6 +252,7 @@ class Login extends React.Component <Props> {
 
                   value={this.state.password}
                   />
+
           </View>
 
             <View style={{width:wp('100%'), flexDirection:'row', alignSelf:'center',justifyContent:'space-evenly'}}>
@@ -166,6 +281,21 @@ class Login extends React.Component <Props> {
             </View>
 
      </View>
+     <Modal
+        animationType = {"fade"}
+        transparent = {true}
+        visible = {this.state.isVisible}
+        onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+            <View style ={styles.modal} >
+
+            <Spinner />
+                </View>
+
+
+
+
+      </Modal>
    </View>
 
 
@@ -221,6 +351,19 @@ position:'absolute',
 
 top:hp('35%'),
  },
+ modal: {
+   justifyContent: 'center',
+   alignItems: 'center',
+   backgroundColor : "transparent",
+   height: 400 ,
+   width: '80%',
+   borderRadius:10,
+   borderWidth: 0,
+   borderColor: '#fff',
+   marginTop: 100,
+   marginLeft: 40,
+
+    },
   input: {
      width: 350,
      height: 55,
@@ -399,6 +542,8 @@ flowerSize:{
  height:hp('100%'),
  marginLeft:400,
  backgroundColor:'#fff',
-
-}
+},
+spinnerTextStyle: {
+   color: '#FFF'
+ },
 })

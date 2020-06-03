@@ -9,6 +9,7 @@ import {
   Button,
   Dimensions,
   Image,
+    Modal,
   TouchableOpacity,
    BackHandler
 } from 'react-native';
@@ -28,6 +29,7 @@ import {
 import Hr from 'react-native-hr-component'
 const width = Dimensions.get('window').width;
 import MediumLogo from '../components/logo/mediumLogo'
+import Spinner from './spinner'
 
 class SignUp extends React.Component <Props> {
 
@@ -43,29 +45,80 @@ class SignUp extends React.Component <Props> {
            password: '',
             name: '',
             phone: '',
+            profession:'',
+            isVisible:false,
         }
 
 
 }
 
    saveData = ()=>{
-          const {email,password} = this.state;
+  this.setState({ isVisible: true});
+   this.setState({ profession: 'User'});
 
-          //save data with asyncstorage
-          let loginDetails={
-              email: email,
-              password: password
-          }
+        // POST request using fetch with error handling
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: this.state.name,
+              email: this.state.email,
+              password: this.state.password,
+              phone: this.state.phone,
+              profession: this.state.profession,
+              })
+        };
+        fetch('http://0886d79e2291.ngrok.io/createuser', requestOptions)
+            .then(async response => {
+                const data = await response.json();
 
-          if(email=='harrison' && password == 'admin')
-          {
+                // check for error response
+                if (!response.ok) {
+                  this.setState({ isVisible: false});
+                    // get error message from body or default to response status
+                    const error = (data && data.message) || response.status;
+                    return Promise.reject(error);
+                    alert(error)
+                }
 
-              alert("Successful Login!. Welcome to Abide In My Word Daily Devotional")
-             this.props.navigation.navigate('Home')}
+                this.setState({
+                  // postId: data.id,
+                  // name:data.name,
+                  // email:data.email,
+                  // phone:data.phone
+                 })
+                  this.setState({ isVisible: false});
+                alert( this.state.name + " " +"Registration Successful! Please Login ")
+                 this.props.navigation.navigate('Login')
+            })
+            .catch(error => {
+                this.setState({ errorMessage: error.toString() });
+               // console.error('There was an error!', error);
+                 alert(error)
 
-          else if (email !='harrison' && password != 'admin'){
-            alert("Sorry Registration has been disabled by admin! Please Contact Your Admin On  08062585929")
-            this.props.navigation.navigate('')}
+            });
+
+
+
+
+          //
+          // const {email,password} = this.state;
+          //
+          // //save data with asyncstorage
+          // let loginDetails={
+          //     email: email,
+          //     password: password
+          // }
+          //
+          // if(email=='harrison' && password == 'admin')
+          // {
+          //
+          //     alert("Successful Login!. Welcome to Abide In My Word Daily Devotional")
+          //    this.props.navigation.navigate('Home')}
+          //
+          // else if (email !='harrison' && password != 'admin'){
+          //   alert("Sorry Registration has been disabled by admin! Please Contact Your Admin On  08062585929")
+          //   this.props.navigation.navigate('')}
 
 
 
@@ -137,9 +190,11 @@ class SignUp extends React.Component <Props> {
 
                   <TextInput
                   style={styles.input1}
-                  placeholder='Password'
+                  placeholder='4 Digit Pin'
                   autoCapitalize="none"
+                  keyboardType='numeric'
                   secureTextEntry={true}
+                  maxLength={4}  //setting limit of input
                   placeholderTextColor='gray'
                   onChangeText={(passwordVal) =>{
                    this.setState({
@@ -148,6 +203,7 @@ class SignUp extends React.Component <Props> {
                   }}
 
                   value={this.state.password}
+
                   />
                   <TextInput
                   style={styles.input1}
@@ -164,7 +220,7 @@ class SignUp extends React.Component <Props> {
                   />
                   <TextInput
                   style={styles.input1}
-                  placeholder='State and City of Residence'
+                  placeholder='Email address'
                   autoCapitalize="none"
                   placeholderTextColor='gray'
                   onChangeText={(emailVal) =>{
@@ -197,6 +253,24 @@ class SignUp extends React.Component <Props> {
            </View>
            </View>
      </View>
+     <Modal
+        animationType = {"fade"}
+        transparent = {true}
+        visible = {this.state.isVisible}
+        onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+
+            <View style ={styles.modal} >
+
+            <Spinner
+
+              />
+                </View>
+
+
+
+
+      </Modal>
    </View>
 
 
@@ -263,7 +337,19 @@ top:hp('24%'),
        marginLeft:wp('15%'),
        marginRight:wp('15%'),
     },
+    modal: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor : "transparent",
+      height: 400 ,
+      width: '80%',
+      borderRadius:10,
+      borderWidth: 0,
+      borderColor: '#fff',
+      marginTop: 100,
+      marginLeft: 40,
 
+       },
     signButton: {
     backgroundColor:'#666699',
     width:wp('40%'),

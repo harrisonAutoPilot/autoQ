@@ -39,7 +39,9 @@ const height = Dimensions.get('window').height;
  class Welcome extends React.Component <Props> {
   constructor(props) {
       super(props);
-
+          //Setting up global
+          global.urlLogin = 'http://0886d79e2291.ngrok.io/userlogin';
+          global.MyVar = 'https://aboutreact.com';
       this.state = {
         size: { width, height },
          spinAnim: new Animated.Value(0),

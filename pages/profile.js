@@ -121,11 +121,10 @@ class Profile extends React.Component <Props> {
                 <View style={styles.info}><Text style = {styles.infoText}>+234 806 2585 929</Text></View>
              </View>
              <TouchableOpacity
-                  // onPress={this.saveData}>
-                   onPress={() => BackHandler.exitApp()}>
+                  onPress={() => this.props.navigation.navigate('Welcome')}>
              <View  style={styles.input1}>
                 <View style={styles.icon}><Image source={require('../assets/logout.png')} style={styles.iconSize}/></View>
-                <View style={styles.info}><Text style = {styles.infoText}>Log OutText</Text></View>
+                <View style={styles.info}><Text style = {styles.infoText}>Log Out</Text></View>
              </View>
               </TouchableOpacity>
           </View>

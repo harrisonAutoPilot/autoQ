@@ -27,7 +27,8 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import Hr from 'react-native-hr-component'
+import Hr from 'react-native-hr-component';
+import Spinner from './spinner'
 import SmallLogo from '../components/logo/smallLogo'
 const width = Dimensions.get('window').width;
 
@@ -65,7 +66,8 @@ class SearchDetails extends React.Component <Props> {
           password: '',
           name: '',
           phone: '',
-          mobile_no: '8035780380',
+          isVisibleSpinner:false,
+          mobile_no: '',
           msg: '',
           isVisible:false,
        }
@@ -78,7 +80,7 @@ dialCall = () => {
     let phoneNumber = '';
 
     if (Platform.OS === 'android') {
-      phoneNumber = 'tel:${08035780380}';
+      phoneNumber = 'tel:${this.state.seller_number}'; 
     }
     else {
       phoneNumber = 'telprompt:${08062585929}';
@@ -89,7 +91,7 @@ dialCall = () => {
 
 sendOnWhatsApp=() => {
     let msg = this.state.msg;
-    let mobile = this.state.mobile_no;
+    let mobile = this.state.seller_number;
     if(mobile){
       if(msg){
         let url = 'whatsapp://send?text=' + this.state.msg + '&phone=+234' + this.state.mobile_no;
@@ -105,6 +107,90 @@ sendOnWhatsApp=() => {
       alert('Please insert mobile no');
     }
   }
+
+
+            componentDidMount() {
+               this.searchDetails();
+             }
+
+
+   searchDetails = ()=>{
+
+          const {id} = this.state;
+             this.setState({ isVisibleSpinner:true})
+          const requestOptions = {
+
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+               id: this.props.navigation.getParam('id'),
+
+               //id:this.props.navigation.state.params.va.id
+
+                })
+          };
+          fetch('http://0886d79e2291.ngrok.io/getSparePartsById', requestOptions)
+          .then(async response => {
+              const data = await response.json();
+                 console.log('this is for the details', data);
+                 this.setState({ isVisibleSpinner:false})
+                 this.setState({
+                   id: data && data.user.id,
+                   parts_name:data && data.user.parts_name,
+                   // email: data.user.email,
+                   parts_number:data && data.user.parts_number,
+                 description:data && data.user.description,
+                   seller_state:data && data.user.seller_state,
+                   seller_address:data && data.user.seller_address,
+                   price:data && data.user.price,
+                   parts_status:data && data.user.parts_status,
+                  })
+                 console.log('just to harry2', this.state.check.user);
+                  // let id = data && data.user.id;
+                  // let parts_name =  data && data.user.parts_name;
+                  // let description =  data && data.user.description;
+
+
+                        if  (response.status === 200){
+                         // console.log('odi look',id);
+                         // try {
+                         //   this.setState({ isVisibleSpinner: false});
+                         //   await AsyncStorage.setItem('Parts_id', okk)
+                         //   alert(id + " " + 'Data successfully saved')
+                         //   this.props.RBSheet.close();
+                         //   this.props.navigation.navigate('SearchPartsList',{car_type: this.state.value , parts_name1: this.state.parts,})
+                         //
+                         //    console.log('odi next',description);
+                         // } catch (e) {
+                         //  this.setState({ errorMessage: error.toString() });
+                         //  this.setState({ isVisible: false});
+                         //  // alert(error)
+                         //   alert( error, 'Failed to save the data to the storage')
+                         // }
+                                 this.setState({ isVisibleSpinner: false});
+                               // this.props.navigation.navigate('Home')
+                        } else{
+                            // this.setState({loader: false});
+                            // this.setState({code: 'Error'});
+                            // this.setState({resp: userInfo});
+                            // this.setState({dialogVisible: true});
+                            // this.setState({ errorMessage: error.toString() });
+                            this.setState({ isVisible: false});
+                             alert(error)
+
+                        }
+                 })
+
+
+   }
+
+
+
+
+
+
+
+
 
   render() {
     const {navigate} = this.props.navigation;
@@ -127,23 +213,23 @@ sendOnWhatsApp=() => {
            <View style={styles.username}>
                 <View  style={styles.input1}>
                    <View style={styles.title}><Text style = {styles.titleText}>Parts Name:</Text></View>
-                   <View style={styles.info}><Text style = {styles.infoText}>Brake Pad</Text></View>
+                   <View style={styles.info}><Text style = {styles.infoText}>{this.state.parts_name}</Text></View>
                </View>
                <View  style={styles.input1}>
                   <View style={styles.title}><Text style = {styles.titleText}>Parts Number:</Text></View>
-                  <View style={styles.info}><Text style = {styles.infoText}>K3748229</Text></View>
+                  <View style={styles.info}><Text style = {styles.infoText}>{this.state.parts_number}</Text></View>
               </View>
               <View  style={styles.input1}>
                  <View style={styles.title}><Text style = {styles.titleText}>Price:</Text></View>
-                 <View style={styles.info}><Text style = {styles.infoText}>₦ 25,000</Text></View>
+                 <View style={styles.info}><Text style = {styles.infoText}>{this.state.price}</Text></View>
              </View>
              <View  style={styles.input1}>
                 <View style={styles.title}><Text style = {styles.titleText}>Condition:</Text></View>
-                <View style={styles.info}><Text style = {styles.infoText}>Fairly Used</Text></View>
+                <View style={styles.info}><Text style = {styles.infoText}>{this.state.parts_status}</Text></View>
             </View>
              <View  style={styles.input1}>
                 <View style={styles.title}><Text style = {styles.titleText}>Description:</Text></View>
-                <View style={styles.info}><Text style = {styles.infoText}>Clean Brake Pad, with 7 Days after Installation Warranty </Text></View>
+                <View style={styles.info}><Text style = {styles.infoText}>{this.state.description} </Text></View>
             </View>
 
 
@@ -245,7 +331,24 @@ sendOnWhatsApp=() => {
          </View>
 
        </Modal>
-   </View>
+       <Modal
+          animationType = {"fade"}
+          transparent = {true}
+          visible = {this.state.isVisibleSpinner}
+          onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+              <View style ={styles.modalSpinner} >
+
+              <Spinner />
+              <Text style={{color:'gray'}}>Processing ...</Text>
+                  </View>
+
+
+
+
+        </Modal>
+       </View>
+
 
 
 
@@ -326,8 +429,20 @@ width:wp('100%'),
   zIndex:6,
   marginTop:50,
   marginBottom:50,
-
    },
+   modalSpinner: {
+     justifyContent: 'center',
+     alignItems: 'center',
+     backgroundColor : "transparent",
+     height: 400 ,
+     width: '80%',
+     borderRadius:10,
+     borderWidth: 0,
+     borderColor: '#fff',
+     marginTop: 100,
+     marginLeft: 40,
+
+      },
    phoneContainer1:{
     width:80,
     height:80,

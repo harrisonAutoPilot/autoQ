@@ -28,11 +28,12 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import VSmallLogo from '../components/logo/vSmallLogo'
+import AsyncStorage from '@react-native-community/async-storage';
+import SmallLogo from '../components/logo/smallLogo'
 import Hr from 'react-native-hr-component'
 const width = Dimensions.get('window').width;
 import Select from 'react-native-select-plus';
-
+import Spinner from './spinner'
 class Home extends React.Component <Props> {
  static navigationOptions = {
     //To hide the NavigationBar from current Screen
@@ -46,6 +47,7 @@ class Home extends React.Component <Props> {
           password: '',
            name: '',
            phone: '',
+           isVisibleOption:false,
            visible: false,
           isVisible: false,
           isVisibleSuccess:false,
@@ -54,20 +56,54 @@ class Home extends React.Component <Props> {
           location3: '',
           location4: '',
           location5: '',
+          userSet:'',
           value: null,
        items: [
-     { key: 1, label: "Abia" },
-     { key: 2, label: "Adamawa" },
-     { key: 3, label: "Akwa Ibom" },
-     { key: 4, label: "Anambra" },
-     { key: 5, label: "Magic" },
-     { key: 6, label: "Fashion" },
-     { key: 7, label: "Building" },
-     { key: 8, label: "Art" },
-     { key: 9, label: "Academics" },
+     { key :1,  label:'Abia State'},
+     { key :2,  label:'Adamawa State'},
+     { key :3,  label:'Akwa Ibom State'},
+     { key :4,  label:'Anambra State'},
+     { key :5,  label:'Bauchi State'},
+     { key :6,  label:'Bayelsa State'},
+     { key :7,  label:'Benue State'},
+     { key :8,  label:'Borno State'},
+     { key :9,  label:'Cross River State'},
+     { key :10, label: 'Delta State'},
+     { key :11, label: 'Ebonyi State'},
+     { key :12, label: 'Edo State'},
+     { key :13, label: 'Ekiti State'},
+     { key :14, label: 'Enugu State'},
+     { key :15, label: 'FCT'},
+     { key :16, label: 'Gombe State'},
+     { key :17, label: 'Imo State'},
+     { key :18, label: 'Jigawa State'},
+     { key :19, label: 'Kaduna State'},
+     { key :20, label: 'Kano State'},
+     { key :21, label: 'Katsina State'},
+     { key :22, label: 'Kebbi State'},
+     { key :23, label: 'Kogi State'},
+     { key :24, label: 'Kwara State'},
+     { key :25, label: 'Lagos State'},
+     { key :26, label: 'Nasarawa State'},
+     { key :27, label: 'Niger State'},
+     { key :28, label: 'Ogun State'},
+     { key :29, label: 'Ondo State'},
+     { key :30, label: 'Osun State'},
+     { key :31, label: 'Oyo State'},
+     { key :32, label: 'Plateau State'},
+     { key :33, label: 'Rivers State'},
+     { key :34, label: 'Sokoto State'},
+     { key :35, label: 'Taraba State'},
+     { key :36, label: 'Yobe State'},
+     { key :37, label: 'Zamfara State'},
 
    ],
  };
+
+
+
+
+
 
  this.onSelectedItemsChange = (key, value) => {
    this.setState({ value: value });
@@ -78,26 +114,92 @@ class Home extends React.Component <Props> {
 saveData2 = ()=>{
       this.setState({
        isVisible:false,
+       isVisibleSpinner:false,
        isVisibleSuccess:true,
+       email:'',
       });
-
-
 }
 
+            componentDidMount() {
+                   this.readData();
+             }
 
-componentWillMount() {
-BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-}
 
-componentWillUnmount() {
-BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-}
+           componentWillMount() {
+           BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+           }
 
-handleBackButtonClick() {
-this.props.navigation.navigate('love');
-return true;
-}
+          componentWillUnmount() {
+          BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+          }
 
+         handleBackButtonClick() {
+          this.setState({
+           isVisibleOption:true,
+          });
+       return true;
+         }
+
+
+          readData = async () => {
+
+           try {
+                const value = await AsyncStorage.getItem('email1');
+                if (value !== null) {
+                 //setAge(value)
+                 console.log('this is it', value);
+                 //alert('Displayed Successfully', value )
+                 this.setState({email:value});
+                 this.fetchUsingEmail();
+                }
+              } catch (error) {
+                 alert('Failed to fetch the data from storage')
+              }
+           }
+            // const myEmail = JSON.parse(this.state.email);
+            //  console.log(myEmail);
+           fetchUsingEmail = ()=>{
+            this.setState({isVisibleSpinner:true})
+            // POST request using fetch with error handling
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: this.state.email,
+                  })
+            };
+                  fetch('http://0886d79e2291.ngrok.io/getUserByEmail', requestOptions)
+                  .then(async response => {
+                      const data = await response.json();
+                   console.log('I want to know', data);
+                   this.setState({
+                     id: data && data.user.id,
+                     name:data && data.user.name,
+                     // email: data.user.email,
+                     chat_request: data.user.chat_request,
+                     call_request: data.user.call_request,
+                     profession:data.user.profession,
+                    })
+                    this.setState({isVisibleSpinner:false})
+                    let id =  data && data.user.id;
+                    let name =  data && data.user.name;
+                    let email =  data && data.user.email;
+
+                          if  (response.status === 200){
+                                 // this.props.navigation.navigate('Home')
+                          } else{
+                              // this.setState({loader: false});
+                              // this.setState({code: 'Error'});
+                              // this.setState({resp: userInfo});
+                              // this.setState({dialogVisible: true});
+                              // this.setState({ errorMessage: error.toString() });
+                              this.setState({isVisibleSpinner:false})
+                               alert(error)
+
+                          }
+                   })
+
+           }
 
 
 
@@ -118,8 +220,8 @@ return true;
     <TouchableOpacity
         style={styles.circleTop}
         onPress={() => this.props.navigation.navigate('Profile')}>
-   <Image source={require('../assets/logout.png')} style={styles.imageSizeLogout} />
-   <Text style={{fontSize:8, textAlign:'center', fontWeight:'bold'}}>Logout</Text>
+   <Image source={require('../assets/worker23.png')} style={styles.imageSizeLogout} />
+   <Text style={{fontSize:8, textAlign:'center', fontWeight:'bold',color:'#666699', marginLeft:5}}>Profile</Text>
     </TouchableOpacity>
    </View>
    </View>
@@ -133,15 +235,15 @@ return true;
       <Image source={require('../assets/segun.jpeg')} style={styles.profileImg} />
       </View>
       <View style={{marginTop:10, alignItems:'center'}}>
-      <Text style={{fontSize:25, textAlign:'center', fontWeight:'bold',color:'#ff6600' }}>Segun Bolodeoku</Text>
-      <Text style={{fontSize:15, textAlign:'center', fontWeight:'bold',color:'#747474' }}>Mechanic</Text>
+      <Text style={{fontSize:25, textAlign:'center', fontWeight:'bold',color:'#ff6600',textTransform:'capitalize'  }}>{this.state.name}</Text>
+      <Text style={{fontSize:15, textAlign:'center', fontWeight:'bold',color:'#747474', textTransform:'capitalize' }}>{this.state.profession}</Text>
       </View>
 </View>
               <View style={styles.report}>
                     <View styles={styles.callReport}>
                         <Image source={require('../assets/phoneColor.png')} style={styles.callImg} />
                         <Text style={{textAlign:'center'}}>Call Request</Text>
-                        <Text style={{textAlign:'center',fontWeight:'bold', fontSize:16}}>16</Text>
+                        <Text style={{textAlign:'center',fontWeight:'bold', fontSize:16}}>{this.state.call_request}</Text>
                     </View>
 
                     <View
@@ -156,7 +258,7 @@ return true;
               <View styles={styles.chatReport}>
                <Image source={require('../assets/whatsapp.png')} style={styles.chatImg} />
               <Text style={{textAlign:'center'}}>Chat Request</Text>
-                  <Text style={{textAlign:'center',fontWeight:'bold', fontSize:16}}>5</Text>
+                  <Text style={{textAlign:'center',fontWeight:'bold', fontSize:16}}>{this.state.chat_request}</Text>
               </View>
               </View>
 
@@ -338,10 +440,52 @@ return true;
 
 
        </Modal>
+       <Modal
+          animationType = {"fade"}
+          transparent = {true}
+          visible = {this.state.isVisibleOption}
+          onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
 
-   </View>
+
+              <View style ={styles.modal1} >
+               <SmallLogo />
+                    <Text style={{alignItems:'center', color:'#666699', fontSize:20, margin:20}}>Hi! Do you want to log out?</Text>
+
+                                      <View style={styles.otherServiceBtn1}>
+                                      <TouchableOpacity style={styles.bckBtnP}   onPress={() => this.props.navigation.navigate('Welcome')}>
+
+                                      <Text style={{color:'gray', fontSize:12,marginLeft:3}}>YES</Text>
+                                      </TouchableOpacity>
+                                      <TouchableOpacity style={styles.bckBtnP} onPress = {() => {
+                                          this.setState({ isVisibleOption:false})}}>
+
+                                          <Text style={{color:'gray', fontSize:12,marginLeft:3}}>NO</Text>
+                                      </TouchableOpacity>
+
+                                      </View>
+                  </View>
 
 
+        </Modal>
+
+
+        <Modal
+           animationType = {"fade"}
+           transparent = {true}
+           visible = {this.state.isVisibleSpinner}
+           onRequestClose = {() =>{ console.log("Modal has been closed.") } }>
+
+               <View style ={styles.modalSpinner} >
+
+               <Spinner />
+               <Text style={{color:'gray'}}>Processing ...</Text>
+                   </View>
+
+
+
+
+         </Modal>
+       </View>
 
     );
   }
@@ -391,8 +535,8 @@ flexDirection:'column',
    marginRight:30,
    },
   imageSizeLogout:{
-  width: 40,
-  height:40,
+  width: 30,
+  height:30,
   alignSelf: 'center',
   resizeMode: 'contain',
    },
@@ -681,11 +825,11 @@ juiceSize:{
  height:80,
  margin:40
 },
-modal: {
+modal1: {
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor : "#fff",
-  height: 450 ,
+  height: 350 ,
   width: '80%',
   borderRadius:10,
   borderWidth: 1,
@@ -698,6 +842,36 @@ modal: {
  shadowRadius: 1,
   elevation: hp('0.8%'),
    },
+   modal: {
+     justifyContent: 'center',
+     alignItems: 'center',
+     backgroundColor : "#fff",
+     height: 500 ,
+     width: '80%',
+     borderRadius:10,
+     borderWidth: 1,
+     borderColor: '#fff',
+     marginTop: 20,
+     marginLeft: 40,
+     shadowColor: '#fff',
+    shadowOffset: { width: 0, height:hp('1.5%') },
+    shadowOpacity: 2,
+    shadowRadius: 1,
+     elevation: hp('0.8%'),
+      },
+      modalSpinner: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor : "transparent",
+        height: 400 ,
+        width: '80%',
+        borderRadius:10,
+        borderWidth: 0,
+        borderColor: '#fff',
+        marginTop: 100,
+        marginLeft: 40,
+
+         },
 selectContainer:{
 flexDirection:'column',
 width:300,
@@ -746,14 +920,7 @@ otherServiceBtn:{
  flexDirection:'row',
  justifyContent:'space-evenly'
 },
-otherServiceBtn1:{
- width:320,
- height:90,
- alignItems:'center',
- flexDirection:'column',
 
-
-},
 otherServiceBtnSer:{
  width:320,
  height:40,
@@ -792,9 +959,74 @@ shadowRadius: 1,
  marginTop:30
 },
 
-bckBtnP:{
- width:280,
+btnContainerSer:{
+ width:270,
+ height:100,
+ borderWidth:0,
+ borderStyle:'solid',
+ borderColor:'#f6f6f6',
+ position:'absolute',
+ top:150,
+ alignItems:'center',
+},
+reqBtn:{
+ width:250,
+ height:35,
+ backgroundColor:'#fff',
+ margin:5,
+ alignItems:'center',
+ justifyContent:'center',
+ shadowColor: '#fff',
+shadowOffset: { width: 0, height:hp('1.5%') },
+shadowOpacity: 2,
+shadowRadius: 1,
+ elevation: hp('0.8%'),
+ borderRadius:50,
+},
+otherServiceBtn:{
+ width:300,
  height:40,
+ alignItems:'center',
+ flexDirection:'row',
+ justifyContent:'space-evenly',
+ zIndex:20,
+},
+otherServiceBtn1:{
+ width:320,
+ height:90,
+ alignItems:'center',
+ flexDirection:'column',
+justifyContent:'center',
+// marginLeft:45,
+// marginRight:45,
+},
+otherServiceBtnSer:{
+ width:320,
+ height:40,
+ alignItems:'center',
+ flexDirection:'row',
+ justifyContent:'space-evenly'
+
+},
+bckBtn:{
+ width:100,
+ height:35,
+ backgroundColor:'#fff',
+ alignItems:'center',
+ justifyContent:'center',
+ shadowColor: '#fff',
+shadowOffset: { width: 0, height:hp('1.5%') },
+shadowOpacity: 2,
+shadowRadius: 1,
+ elevation: hp('0.8%'),
+ alignItems:'center',
+ borderRadius:50,
+ zIndex:20,
+},
+
+bckBtnP:{
+ width:150,
+ height:37,
  backgroundColor:'#fff',
  alignItems:'center',
  justifyContent:'center',
@@ -807,6 +1039,8 @@ shadowRadius: 1,
  borderRadius:50,
  borderColor:'gray',
  flexDirection:'row',
- marginTop:10,
+ marginTop:20,
+ borderColor:'#f4f4f4',
+ borderWidth:1,
 },
 })
